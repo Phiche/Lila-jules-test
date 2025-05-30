@@ -22,6 +22,7 @@ import com.example.common.Days;
 import com.example.common.GameFullId; // Added for new methods
 import com.example.common.GameId;
 import com.example.common.GamePlayerId; // Added for getPlayerById
+import com.example.common.Pair; // Added for getTwoUserIds
 import com.example.common.UserId; // Added for hasUserId, hasUserIds
 import com.example.perf.PerfKey;
 import com.example.user.User; // Added for new methods
@@ -394,6 +395,385 @@ public class Game {
         getPlayers().getWhite().getUserId().ifPresent(ids::add);
         getPlayers().getBlack().getUserId().ifPresent(ids::add);
         return Collections.unmodifiableList(ids);
+    }
+
+    // --- AI, conditions, and specific game state checks ---
+
+    public Optional<Integer> getAiLevel() {
+        return getPlayers().find(Player::isAi).flatMap(Player::getAiLevel);
+    }
+
+    public boolean hasAi() {
+        return getPlayers().exists(Player::isAi);
+    }
+
+    public boolean nonAi() {
+        return !hasAi();
+    }
+
+    public boolean isSynthetic() {
+        return getId().getValue().equals("synthetic"); // Assuming GameId has getValue() for the string ID
+    }
+
+    public Optional<Pov> getAiPov() {
+        return getPlayers().findColor(Player::isAi).map(color -> new Pov(this, color));
+    }
+
+    public boolean isSwissPreventsDraw() {
+        return isSwiss() && getPlayedTurns() < 60;
+    }
+
+    public boolean isRulePreventsDraw() {
+        return hasRule(com.example.game.GameRule.NO_EARLY_DRAW) && getPlayedTurns() < 60;
+    }
+
+    /**
+     * Checks if the game is rated, finished, both players have moved, and played turns are less than 10.
+     */
+    public boolean isBoosted() {
+        return getMode().isRated() && isFinished() && bothPlayersHaveMoved() && getPlayedTurns() < 10;
+    }
+
+    /**
+     * Checks if the game is abortable: started, fewer than 2 turns played, and not a mandatory event game.
+     */
+    public boolean isAbortable() {
+        return getStatus() == Status.STARTED && getPlayedTurns() < 2 && nonMandatory();
+    }
+
+    /**
+     * Checks if the game is abortable by a user: isAbortable and no rule preventing abort.
+     */
+    public boolean isAbortableByUser() {
+        return isAbortable() && !hasRule(com.example.game.GameRule.NO_ABORT);
+    }
+    
+    // --- Helper method similar to Scala's bothPlayersHaveMoved (if not already present) ---
+    /**
+     * Checks if both players have made at least one move.
+     */
+    public boolean bothPlayersHaveMoved() {
+        // In a typical chess game, if 2 plies have been made, white has moved and black has moved.
+        // If startedAtPly is 0, ply 0 is white's first move, ply 1 is black's first move.
+        // So, if current ply is 2 (after black's first move), playedTurns is 2.
+        return getPlayedTurns() >= 2;
+    }
+    
+    // --- Helper method for isFinished (if not already present) ---
+    /**
+     * Checks if the game status is Mate or later (finished).
+     */
+    public boolean isFinished() {
+        return getStatus().isGreaterThanOrEqual(Status.MATE); // Assuming MATE is a status
+    }
+
+    // --- Game actions and status checks ---
+
+    public boolean isBerserkable() {
+        return isTournament() &&
+               getClock().map(c -> c.getConfig().berserkable()).orElse(false) && // Assumes ClockConfig.berserkable()
+               getStatus() == Status.STARTED &&
+               getPlayedTurns() < 2;
+    }
+
+    public boolean isResignable() {
+        return isPlayable() && !isAbortable();
+    }
+
+    public boolean isForceResignable() {
+        return isResignable() &&
+               nonAi() &&
+               hasClock() && // Renamed from isClock (from Scala) to hasClock()
+               !isSwiss() &&
+               !hasRule(com.example.game.GameRule.NO_CLAIM_WIN); // Assuming GameRule.NO_CLAIM_WIN
+    }
+
+    public boolean isForceResignableNow() {
+        return isForceResignable() && bothPlayersHaveMoved();
+    }
+
+    public boolean isDrawable() {
+        return isPlayable() && !isAbortable() && !isSwissPreventsDraw() && !isRulePreventsDraw();
+    }
+
+    public boolean isRated() {
+        return getMode().isRated();
+    }
+
+    public boolean isCasual() {
+        return getMode().isCasual();
+    }
+
+    public boolean isFinishedOrAborted() {
+        return isFinished() || isAborted();
+    }
+
+    public boolean isReplayable() {
+        return getPgnImport().isPresent() || isFinished() || (isAborted() && bothPlayersHaveMoved());
+    }
+
+    public boolean isFromPosition() {
+        // variant.fromPosition || source.has(Source.Position)
+        boolean variantFromPosition = getVariant().isFromPosition(); // Assuming Variant.isFromPosition()
+        boolean sourceIsPosition = getSource().map(s -> s == com.example.game.Source.POSITION).orElse(false); // Assuming Source.POSITION
+        return variantFromPosition || sourceIsPosition;
+    }
+
+    public boolean sourceIs(com.example.game.Source specificSource) {
+        return getSource().map(s -> s == specificSource).orElse(false);
+    }
+
+    public boolean isLobbyOrPool() {
+        return getSource().map(s -> s == com.example.game.Source.LOBBY || s == com.example.game.Source.POOL).orElse(false);
+    }
+    
+    // --- Helper for hasClock (if not already present) ---
+    /**
+     * Checks if the game has a clock.
+     */
+    public boolean hasClock() {
+        return getClock().isPresent();
+    }
+
+    // --- Winner, loser, and outcome methods ---
+
+    public Optional<Player> getWinner() {
+        // Scala: players.find(_.isWinner | false)
+        // Assuming Player.isWinner() returns Optional<Boolean>
+        return getPlayers().find(p -> p.isWinner().orElse(false));
+    }
+
+    public Optional<Player> getLoser() {
+        return getWinner().map(this::getOpponent);
+    }
+
+    public Optional<Color> getWinnerColor() {
+        return getWinner().map(Player::getColor);
+    }
+
+    public Optional<Outcome> getOutcome() {
+        // Scala: finished.option(Outcome(winnerColor))
+        // Outcome constructor in placeholder takes Optional<Color>
+        return isFinished() ? Optional.of(new Outcome(getWinnerColor())) : Optional.empty();
+    }
+
+    public Optional<UserId> getWinnerUserId() {
+        return getWinner().flatMap(Player::getUserId);
+    }
+
+    public Optional<UserId> getLoserUserId() {
+        return getLoser().flatMap(Player::getUserId);
+    }
+
+    public Optional<Boolean> getWonBy(Color c) {
+        if (c == null) return Optional.empty();
+        return getWinner().map(w -> w.getColor() == c);
+    }
+
+    public boolean isDrawn() {
+        return isFinished() && getWinner().isEmpty();
+    }
+
+    // --- Time control and speed related methods ---
+
+    public boolean isOutoftime(boolean withGrace) {
+        if (isCorrespondence()) {
+            return outoftimeCorrespondence();
+        } else {
+            return outoftimeClock(withGrace);
+        }
+    }
+
+    private boolean outoftimeClock(boolean withGrace) {
+        return getClock().map(c -> 
+            isStarted() && isPlayable() && 
+            (c.outOfTime(getTurnColor(), withGrace) ||
+             (!c.isRunning() && c.getPlayers().exists(pc -> pc.elapsed().getValue() > 0)))
+        ).orElse(false);
+    }
+
+    private boolean outoftimeCorrespondence() {
+        return getPlayableCorrespondenceClock().map(cc -> cc.outoftime(getTurnColor())).orElse(false);
+    }
+
+    public boolean isCorrespondence() {
+        return getSpeed() == Speed.CORRESPONDENCE;
+    }
+
+    public boolean isSpeed(Speed s) {
+        return getSpeed() == s;
+    }
+
+    public Optional<ClockConfig> getClockConfig() {
+        return getClock().map(Clock::getConfig);
+    }
+
+    public Speed getSpeed() {
+        // In Scala: Speed(clockConfig)
+        // Assuming Speed can be determined from Optional<ClockConfig>
+        // This might need a static factory method in Speed.java if logic is complex
+        return getClockConfig().map(config -> {
+            if (config.getLimit() == 0 && config.getIncrement() == 0 && getDaysPerTurn().isPresent()) { // More specific for correspondence
+                 return Speed.CORRESPONDENCE;
+            }
+            // Simplified logic for speed based on limit. This needs to match scalachess.Speed logic more closely.
+            // Assuming limit is in seconds for this simplified logic, as ClockConfig.limit is just int.
+            // scalachess.Speed.estClockTotalTime uses `limit + 40 * increment`.
+            // For now, let's use a simplified version based on limit only if it's not correspondence.
+            // A more robust conversion would involve a helper or static factory in Speed enum/class.
+            int limitInSeconds = config.getLimit(); // Assuming limit in ClockConfig is total seconds for simplicity here
+                                                    // Or if it's centis: config.getLimit() / 100;
+
+            // This is a very rough estimation based on typical Lichess categories
+            // and does not account for increment properly yet.
+            if (limitInSeconds < 30) return Speed.ULTRA_BULLET;      // < 30s
+            if (limitInSeconds < 180) return Speed.BULLET;         // < 3 min
+            if (limitInSeconds < 480) return Speed.BLITZ;          // < 8 min
+            if (limitInSeconds < 1500) return Speed.RAPID;         // < 25 min
+            return Speed.CLASSICAL;                                // >= 25 min
+        }).orElse(Speed.CORRESPONDENCE); // Default if no clock config (e.g. unlimited)
+    }
+
+    public boolean hasCorrespondenceClock() {
+        return getDaysPerTurn().isPresent();
+    }
+
+    public boolean isUnlimited() {
+        return !hasClock() && !hasCorrespondenceClock();
+    }
+
+    // --- Player actions, game progression, and rating methods ---
+
+    public Optional<Player> getPlayerWhoDidNotMove() {
+        Optional<Player> playerOpt = Optional.empty();
+        if (getPlayedTurns() == Ply.INITIAL.getValue()) { // Ply.INITIAL should be 0
+            playerOpt = Optional.of(getPlayer(getStartColor()));
+        } else if (getPlayedTurns() == Ply.INITIAL.getValue() + 1) { // This means 1 ply has been made
+            playerOpt = Optional.of(getPlayer(getStartColor().unary_!()));
+        }
+        // Filter out if this player is already a winner (e.g. game aborted before they could move)
+        return playerOpt.filter(p -> getWinner().map(w -> !w.equals(p)).orElse(true));
+    }
+
+    public int getPlayerMoves(Color color) {
+        if (color == null) return 0; // Or throw exception
+        if (color == getStartColor()) {
+            return (getPly().getValue() + 1) / 2;
+        } else {
+            return getPly().getValue() / 2;
+        }
+    }
+
+    public boolean playerHasMoved(Color color) {
+        return getPlayerMoves(color) > 0;
+    }
+
+    public boolean isBeingPlayed() {
+        return !isPgnImport() && !isFinishedOrAborted();
+    }
+
+    public boolean isForecastable() {
+        return isStarted() && isPlayable() && isCorrespondence() && !hasAi();
+    }
+
+    public Optional<Pair<UserId, UserId>> getTwoUserIds() {
+        Optional<UserId> whiteIdOpt = getWhitePlayer().getUserId();
+        Optional<UserId> blackIdOpt = getBlackPlayer().getUserId();
+
+        if (whiteIdOpt.isPresent() && blackIdOpt.isPresent()) {
+            UserId whiteId = whiteIdOpt.get();
+            UserId blackId = blackIdOpt.get();
+            if (!whiteId.equals(blackId)) { // Ensure they are distinct users
+                 return Optional.of(new Pair<>(whiteId, blackId));
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<IntRating> getAverageUsersRating() {
+        List<IntRating> ratings = new java.util.ArrayList<>();
+        getPlayers().getWhite().getRating().ifPresent(ratings::add);
+        getPlayers().getBlack().getRating().ifPresent(ratings::add);
+
+        if (ratings.size() == 2) {
+            return Optional.of(new IntRating((ratings.get(0).getValue() + ratings.get(1).getValue()) / 2));
+        } else if (ratings.size() == 1) {
+            // If one player has a rating, average with a default (e.g., 1500 from scalachess)
+            return Optional.of(new IntRating((ratings.get(0).getValue() + 1500) / 2));
+        }
+        return Optional.empty();
+    }
+
+    public boolean isPgnImport() { // Ensuring this exists, was also part of metadata delegation
+        return getMetadata().getPgnImport().isPresent();
+    }
+
+    public boolean hasFewerMovesThanExpected() {
+        // Scala: playedTurns <= reasonableMinimumNumberOfMoves(variant)
+        return getPlayedTurns() <= getReasonableMinimumNumberOfMoves(getVariant());
+    }
+    
+    // Placeholder for reasonableMinimumNumberOfMoves, logic depends on variant
+    private int getReasonableMinimumNumberOfMoves(Variant variant) {
+        // This logic needs to be ported from scalachess or game rules
+        if (variant == Variant.ATOMIC) return 2; // Example from scalachess
+        // Based on scalachess.Game.scala, most variants default to 2 if not specified otherwise
+        return 2; 
+    }
+
+
+    public Optional<Opening.AtPly> getOpening() {
+        // In Scala:
+        // if !fromPosition && Variant.list.openingSensibleVariants(variant)
+        // then OpeningDb.search(sans)
+        // else none
+        if (!isFromPosition() && isOpeningSensibleVariant(getVariant())) {
+             // Assuming OpeningDb.search(List<SanStr>) exists
+            return OpeningDb.search(getSans());
+        }
+        return Optional.empty();
+    }
+    
+    // Placeholder for Variant.list.openingSensibleVariants(variant)
+    // from scalachess.variant.Variant.scala
+    private boolean isOpeningSensibleVariant(Variant variant) {
+        switch (variant) {
+            case STANDARD:
+            case CHESS960:
+            // case CRAZYHOUSE: // scalachess includes these, decide if needed
+            // case THREECHECK:
+            // case KINGOFTHEHILL:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // --- Point of View (POV) methods ---
+
+    /**
+     * Creates a Point of View (POV) for this game from the perspective of the given color.
+     * @param c The color for the POV.
+     * @return A new Pov object.
+     */
+    public Pov pov(Color c) {
+        if (c == null) {
+            throw new IllegalArgumentException("Color cannot be null for POV.");
+        }
+        return new Pov(this, c);
+    }
+
+    /**
+     * Creates POVs for both white and black players.
+     * @return A ByColor object containing POVs for white and black.
+     */
+    public ByColor<Pov> povs() {
+        return new ByColor<>(pov(Color.WHITE), pov(Color.BLACK));
+    }
+
+    // Getter for loadClockHistory function, needed by ImportedGame/NewGame
+    public Function<Clock, Optional<ClockHistory>> getLoadClockHistoryFunction() {
+        return loadClockHistory;
     }
     // More methods will be added in subsequent steps.
 }

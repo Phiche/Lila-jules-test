@@ -7,9 +7,7 @@ import com.example.chess.RatingProvisional;
 import com.example.common.UserId;
 import java.util.Optional;
 
-// Basic Placeholder for LightPlayer
 public class LightPlayer {
-    // Added fields to make it a bit more useful, matching Player.light()
     private final Color color;
     private final Optional<Integer> aiLevel;
     private final Optional<UserId> userId;
@@ -19,24 +17,22 @@ public class LightPlayer {
     private final boolean berserk;
 
     public LightPlayer(
-        Color color,
-        Optional<Integer> aiLevel,
-        Optional<UserId> userId,
-        Optional<IntRating> rating,
-        Optional<IntRatingDiff> ratingDiff,
-        RatingProvisional provisional,
-        boolean berserk) {
-        // Constructor to be filled
+            Color color,
+            Optional<Integer> aiLevel,
+            Optional<UserId> userId,
+            Optional<IntRating> rating,
+            Optional<IntRatingDiff> ratingDiff,
+            RatingProvisional provisional,
+            boolean berserk) {
         this.color = color;
-        this.aiLevel = aiLevel;
-        this.userId = userId;
-        this.rating = rating;
-        this.ratingDiff = ratingDiff;
-        this.provisional = provisional;
+        this.aiLevel = aiLevel == null ? Optional.empty() : aiLevel;
+        this.userId = userId == null ? Optional.empty() : userId;
+        this.rating = rating == null ? Optional.empty() : rating;
+        this.ratingDiff = ratingDiff == null ? Optional.empty() : ratingDiff;
+        this.provisional = provisional == null ? RatingProvisional.NO : provisional; // Default to NO if null
         this.berserk = berserk;
     }
 
-    // Minimal getters for completeness of placeholder
     public Color getColor() { return color; }
     public Optional<Integer> getAiLevel() { return aiLevel; }
     public Optional<UserId> getUserId() { return userId; }

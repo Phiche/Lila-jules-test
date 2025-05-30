@@ -66,4 +66,31 @@ public class GameMetadata {
         return new GameMetadata(Optional.ofNullable(source), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
             false, GameDrawOffers.EMPTY, Collections.emptySet());
     }
+
+    // --- Immutable "with" methods ---
+    public GameMetadata withPgnImport(Optional<PgnImport> newPgnImport) {
+        return new GameMetadata(
+            this.source,
+            newPgnImport, // new value
+            this.tournamentId,
+            this.swissId,
+            this.simulId,
+            this.analysed,
+            this.drawOffers,
+            this.rules
+        );
+    }
+
+    public GameMetadata withRules(Set<GameRule> newRules) {
+        return new GameMetadata(
+            this.source,
+            this.pgnImport,
+            this.tournamentId,
+            this.swissId,
+            this.simulId,
+            this.analysed,
+            this.drawOffers,
+            newRules // new value
+        );
+    }
 }
