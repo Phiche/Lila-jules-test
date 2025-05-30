@@ -29,7 +29,7 @@ public class GameFactory {
             Optional.empty() // initialFen is not passed to newSloppy, so default for ImportedGame
         );
     }
-    
+
     // Overload for when initialFen is explicitly provided for an imported game
     public static ImportedGame newImportedGameWithFen(
             ChessGame chessGame,
@@ -65,13 +65,13 @@ public class GameFactory {
             Optional<PgnImport> pgnImport,
             Optional<Days> daysPerTurn,
             Set<GameRule> rules) {
-        
+
         Instant createdAt = Instant.now();
         // Ensure GameMetadata.newMetadata returns a GameMetadata instance
         // And that withPgnImport and withRules are available and return GameMetadata
         GameMetadata metadata = GameMetadata.newMetadata(source)
-                                      .withPgnImport(pgnImport) 
-                                      .withRules(rules);      
+                                      .withPgnImport(pgnImport)
+                                      .withRules(rules);
 
         return new Game(
                 IdGenerator.uncheckedGame(), // Uses static method from IdGenerator interface

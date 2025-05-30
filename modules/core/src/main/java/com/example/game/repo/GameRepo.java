@@ -36,7 +36,7 @@ public abstract class GameRepo { // Changed to abstract class to hold BSONCollec
         this.coll = coll;
         this.light = light;
     }
-    
+
     // Abstract methods to be implemented by concrete repo, mirroring the Scala trait
     // These would need actual BSONHandlers for Game and Status if using a similar pattern in Java
     // For now, just declaring them.
@@ -52,7 +52,7 @@ public abstract class GameRepo { // Changed to abstract class to hold BSONCollec
     public abstract CompletableFuture<Optional<Fen.Full>> initialFen(Game game);
     public abstract CompletableFuture<WithInitialFen> withInitialFen(Game game);
     public abstract CompletableFuture<Optional<WithInitialFen>> gameWithInitialFen(GameId gameId);
-    public abstract CompletableFuture<Boolean> isAnalysed(Game game); 
+    public abstract CompletableFuture<Boolean> isAnalysed(Game game);
     public abstract CompletableFuture<Void> insertDenormalized(Game g, Optional<Fen.Full> initialFen);
     public abstract CompletableFuture<List<Game>> recentAnalysableGamesByUserId(UserId userId, int nb);
     public abstract CompletableFuture<List<Game>> lastGamesBetween(User u1, User u2, Instant since, int nb);
@@ -61,5 +61,5 @@ public abstract class GameRepo { // Changed to abstract class to hold BSONCollec
     public abstract CompletableFuture<Void> finish(GameId id, Optional<Color> winnerColor, Optional<UserId> winnerId, Status status);
     public abstract CompletableFuture<Void> remove(GameId id);
     public abstract CompletableFuture<Integer> countWhereUserTurn(UserId userId);
-    public abstract AkkaStreamCursorPlaceholder<Game> sortedCursor(User user, PerfKey pk); 
+    public abstract AkkaStreamCursorPlaceholder<Game> sortedCursor(User user, PerfKey pk);
 }

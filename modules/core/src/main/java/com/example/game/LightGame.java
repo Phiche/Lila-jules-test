@@ -35,7 +35,7 @@ public class LightGame {
 
     public boolean isPlayable() {
         // Assuming Status enum order where CREATED/STARTED are less than ABORTED
-        return status.ordinal() < Status.ABORTED.ordinal(); 
+        return status.ordinal() < Status.ABORTED.ordinal();
     }
 
     public LightPlayer getPlayer(Color color) {
@@ -59,7 +59,7 @@ public class LightGame {
 
     public boolean isFinished() {
         // Assuming MATE is a status indicating a finished game, and enum order is sensible
-        return status.isGreaterThanOrEqual(Status.MATE); 
+        return status.isGreaterThanOrEqual(Status.MATE);
     }
 
     public Optional<LightPlayer> getWinner() {

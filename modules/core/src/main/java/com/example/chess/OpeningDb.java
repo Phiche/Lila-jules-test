@@ -12,25 +12,25 @@ public class OpeningDb {
     public static List<Opening> all() {
         // This would be populated from a database or a static list in a real scenario
         // For now, returning an empty list or a very small sample using the new constructors.
-        // return Collections.emptyList(); 
-        
+        // return Collections.emptyList();
+
         // Example using the simpler constructor:
         return Arrays.asList(
             new Opening("A00", "Anderssen's Opening", "A00", "Anderssen's Opening", null, 1),
             new Opening("A01", "Nimzowitsch-Larsen Attack", "A01", "Nimzowitsch-Larsen Attack", "Modern Variation", 1), // FamilyKey could be A00 too depending on grouping
             new Opening("B01", "Scandinavian Defense", "B01", "Scandinavian Defense", null, 2)
         );
-        
+
         /* Example using the more detailed constructor:
         return Arrays.asList(
-            new Opening("A00", "Anderssen's Opening", 
-                        new OpeningFamily("A00", "Anderssen's Opening"), 
+            new Opening("A00", "Anderssen's Opening",
+                        new OpeningFamily("A00", "Anderssen's Opening"),
                         Optional.empty(), 1, Collections.singletonList(new SanStr("a3"))),
-            new Opening("A01", "Nimzowitsch-Larsen Attack", 
+            new Opening("A01", "Nimzowitsch-Larsen Attack",
                         new OpeningFamily("A01", "Nimzowitsch-Larsen Attack"), // Or group under A00 family
                         Optional.of("Modern Variation"), 1, Collections.singletonList(new SanStr("b3"))),
-            new Opening("B01", "Scandinavian Defense", 
-                        new OpeningFamily("B01", "Scandinavian Defense"), 
+            new Opening("B01", "Scandinavian Defense",
+                        new OpeningFamily("B01", "Scandinavian Defense"),
                         Optional.empty(), 2, Arrays.asList(new SanStr("e4"), new SanStr("d5")))
         );
         */
@@ -42,7 +42,7 @@ public class OpeningDb {
         // Actual search logic would iterate through 'all()' openings, match 'sans' against 'exampleMoves'
         // and return an Opening.AtPly if a match is found.
         // For now, placeholder returns empty.
-        
+
         // Example of how a search might look (very simplified):
         /*
         for (Opening opening : all()) {
@@ -61,7 +61,7 @@ public class OpeningDb {
                     // Found a match. The ply would be opening.getNbMoves() if sans is from game start.
                     // If sans is a sub-sequence, ply needs to be determined differently.
                     return Optional.of(new Opening.AtPly(
-                        opening.getCode(), opening.getName(), opening.getFamily(), 
+                        opening.getCode(), opening.getName(), opening.getFamily(),
                         opening.getVariation(), opening.getNbMoves(), opening.getExampleMoves(),
                         Ply.ofInt(opening.getNbMoves()) // Assuming Ply.ofInt exists or use new Ply()
                     ));
@@ -69,6 +69,6 @@ public class OpeningDb {
             }
         }
         */
-        return Optional.empty(); 
+        return Optional.empty();
     }
 }

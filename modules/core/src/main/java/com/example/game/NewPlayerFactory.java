@@ -13,10 +13,10 @@ import java.util.Optional;
 
 public interface NewPlayerFactory {
     // Player create(Color color, Optional<WithPerf> user); // Requires WithPerf
-    
+
     Player create(Color color, UserId userId, IntRating rating, RatingProvisional provisional);
-    
+
     // Player create(Color color, Pair<UserId, Perf> userPerf); // Requires Pair and Perf
-    
+
     Player createAnon(Color color, Optional<Integer> aiLevel);
 }

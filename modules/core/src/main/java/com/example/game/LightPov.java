@@ -27,7 +27,7 @@ public class LightPov {
 
     public LightPlayer getOpponent() {
         // Assumes Color enum has unary_! method for opponent color
-        return game.getPlayer(color.unary_!()); 
+        return game.getPlayer(color.unary_!());
     }
 
     public static Optional<LightPov> of(LightGame game, UserId userId) {

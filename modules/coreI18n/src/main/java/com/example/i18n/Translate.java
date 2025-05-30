@@ -15,7 +15,7 @@ public class Translate {
 
     public Translator getTranslator() { return translator; }
     public PlayLang getLang() { return lang; }
-    
+
     // Methods from I18nKey that use Translate can be added here or in I18nKey itself if Translate is passed
     // For example, if I18nKey.txt(args...) was a thing:
     // public String txt(I18nKey key, Object... args) {

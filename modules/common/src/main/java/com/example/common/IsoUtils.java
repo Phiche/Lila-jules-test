@@ -68,7 +68,7 @@ public final class IsoUtils {
                                                } catch (NumberFormatException e) {
                                                    // Log error or handle as per application requirements
                                                    // System.err.println("Failed to parse int: " + str);
-                                                   return null; 
+                                                   return null;
                                                }
                                            })
                                            .filter(Objects::nonNull) // Filter out non-parseable
@@ -95,7 +95,7 @@ public final class IsoUtils {
         @Override
         public IpAddress to(String s) {
             // IpAddress.unchecked handles null by creating an IpAddress with ""
-            return IpAddress.unchecked(s); 
+            return IpAddress.unchecked(s);
         }
 
         @Override

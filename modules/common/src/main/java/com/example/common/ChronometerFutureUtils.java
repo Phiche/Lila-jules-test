@@ -22,7 +22,7 @@ public final class ChronometerFutureUtils {
      * If any other exception occurs, it's re-thrown.
      * Increments a monitor counter on timeout.
      */
-    public static <A> A await(CompletableFuture<A> future, Duration duration, String name) 
+    public static <A> A await(CompletableFuture<A> future, Duration duration, String name)
             throws ExecutionException, InterruptedException, TimeoutException {
         try {
             // Original Scala code:
@@ -43,7 +43,7 @@ public final class ChronometerFutureUtils {
             //         // For simplicity in this direct translation of the try-catch, we'll time around it.
             //         // This is not what the original code did, but it's one way to use timeSyncMon.
             //         // The original timed the blocking .get() call.
-            //         throw new RuntimeException(e); 
+            //         throw new RuntimeException(e);
             //     }
             // });
             // However, the current structure of the provided Java code directly calls future.get().
@@ -57,7 +57,7 @@ public final class ChronometerFutureUtils {
             //    return result;
             // } catch (TimeoutException e) {
             //    timer.stop(); // Or record failure
-            //    LilaMon.blockingTimeout(name).increment(); 
+            //    LilaMon.blockingTimeout(name).increment();
             //    throw e;
             // } catch (InterruptedException | ExecutionException e) {
             //    timer.stop(); // Or record failure
@@ -101,7 +101,7 @@ public final class ChronometerFutureUtils {
         long startNanos = ChronometerUtils.nowNanosRel();
         return future.thenApply(res -> new Lap<>(res, ChronometerUtils.nowNanosRel() - startNanos));
     }
-    
+
     // chronometerTry, mon, logTime variants will be added later.
 
     /**
@@ -160,7 +160,7 @@ public final class ChronometerFutureUtils {
             return lapTry.getResult().getSuccess().orElse(null); // Or handle null better
          });
     }
-    
+
     // monSuccess(path: lila.mon.type => Boolean => kamon.metric.Timer): Fu[A]
     // This signature is very Scala/Kamon specific.
     // It implies a function that takes the lila.mon object, then a boolean (isSuccess), then returns a KamonTimer.

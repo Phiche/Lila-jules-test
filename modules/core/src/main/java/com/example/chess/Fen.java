@@ -20,7 +20,7 @@ public class Fen {
             super(value);
         }
     }
-    
+
     // Optional: A static factory method if Fen.Full is constructed from a String
     public static Optional<Full> full(String fenString) {
         // Add validation if necessary

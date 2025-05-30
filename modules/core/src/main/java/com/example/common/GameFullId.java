@@ -32,11 +32,11 @@ public class GameFullId {
          if (value == null || value.length() != FULL_ID_LENGTH) return new GamePlayerId(""); // Or throw
         return new GamePlayerId(value.substring(GAME_ID_LENGTH));
     }
-    
+
     public static GameFullId of(GameId gameId, GamePlayerId playerId) {
         if (gameId == null || playerId == null) {
             // Or throw IllegalArgumentException
-            return new GameFullId(null); 
+            return new GameFullId(null);
         }
         return new GameFullId(gameId.getValue() + playerId.getValue());
     }

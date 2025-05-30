@@ -43,12 +43,12 @@ public class TryValue<A> {
     public Optional<Throwable> getFailure() {
         return Optional.ofNullable(failureValue);
     }
-    
+
     public A get() throws Throwable {
         if (isSuccess()) return successValue;
         throw failureValue;
     }
-    
+
     public A getOrElse(Supplier<A> defaultSupplier) {
         return isSuccess() ? successValue : defaultSupplier.get();
     }
@@ -64,7 +64,7 @@ public class TryValue<A> {
         }
         return (TryValue<B>) this; // It's a failure, so it's already TryValue<Nothing> effectively
     }
-    
+
     @SuppressWarnings("unchecked") // For casting failureValue to TryValue<B> type
     public <B> TryValue<B> flatMap(Function<? super A, ? extends TryValue<B>> f) { // Corrected generic bounds
         if (isSuccess()) {

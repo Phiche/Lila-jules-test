@@ -9,7 +9,7 @@ public class PerfKey {
     public PerfKey(String key) {
         this.key = key;
     }
-    
+
     // Constructor for Variant and Speed, assuming Variant and Speed enums/classes exist
     // public PerfKey(com.example.chess.Variant variant, com.example.chess.Speed speed) {
     //     this.key = variant.toString().toLowerCase() + "_" + speed.toString().toLowerCase();

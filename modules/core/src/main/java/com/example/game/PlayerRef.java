@@ -24,7 +24,7 @@ public class PlayerRef {
         GamePlayerId playerId = fullId.getPlayerId();
 
         // Add validation if the extracted parts are empty, if necessary
-        if (gameId.getValue() == null || gameId.getValue().isEmpty() || 
+        if (gameId.getValue() == null || gameId.getValue().isEmpty() ||
             playerId.getValue() == null || playerId.getValue().isEmpty()) {
             throw new IllegalArgumentException("Invalid GameFullId format, resulted in empty gameId or playerId: " + fullId.getValue());
         }

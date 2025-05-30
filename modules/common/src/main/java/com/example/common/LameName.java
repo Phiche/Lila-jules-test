@@ -83,7 +83,7 @@ public final class LameName {
             .map(word -> word.chars()
                 .mapToObj(c -> (char) c)
                 .map(l -> subs.getOrDefault(l, Pattern.quote(String.valueOf(l)))) // Quote non-mapped chars
-                .map(l_processed -> l_processed + "+") 
+                .map(l_processed -> l_processed + "+")
                 .collect(Collectors.joining()))
             .collect(Collectors.joining("|"));
     }
@@ -93,7 +93,7 @@ public final class LameName {
         USERNAME_REGEX = Pattern.compile("(?i)(?:.*)(" + usernameWordsPatternStr + ")(?:.*)"); // Ensure case-insensitivity and allow surrounding chars
         USERNAME_EXPLAIN_REGEX = Pattern.compile("(" + usernameWordsPatternStr + ")"); // Capturing group for the matched word
     }
-    
+
     private static String simplify(com.example.common.UserName name) {
         if (name == null || name.getValue() == null) {
             return "";
@@ -121,7 +121,7 @@ public final class LameName {
         }
         String simplifiedName = simplify(name);
         if (simplifiedName.isEmpty()) return Optional.empty();
-        
+
         Matcher matcher = USERNAME_EXPLAIN_REGEX.matcher(simplifiedName);
         if (matcher.find()) {
             // Attempt to find which original word caused the match for a clearer explanation

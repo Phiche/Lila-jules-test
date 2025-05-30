@@ -30,33 +30,33 @@ public final class I18nUtils {
     }
 
     public static String translateDuration(java.time.Duration duration, Optional<Boolean> withMinutesOpt, Translate translate) {
-        if (translate == null || duration == null) return ""; 
+        if (translate == null || duration == null) return "";
         boolean useMinutes = withMinutesOpt.orElse(duration.toDays() == 0 && duration.toHours() == 0); // Show minutes if days and hours are 0
-        
+
         List<String> parts = new ArrayList<>();
-        
+
         long days = duration.toDays();
         if (days > 0) {
              // Assuming I18nKey.site.nbDays is now accessible
             parts.add(I18nKey.site.nbDays.pluralSameTxt(translate, days));
         }
-        
+
         long hours = duration.toHours() % 24;
         // Show hours if > 0, or if it's the largest unit being shown (no days, and not only minutes if days=0)
         if (hours > 0 || (days == 0 && (!useMinutes || parts.isEmpty()))) {
             parts.add(I18nKey.site.nbHours.pluralSameTxt(translate, hours));
         }
-        
+
         if (useMinutes) {
             long minutes = duration.toMinutes() % 60;
             // Show minutes if > 0, or if it's the only unit intended to be shown (e.g. duration < 1 hour)
             // or if parts is empty (e.g. duration is 0, show "0 minutes")
-            if (minutes > 0 || (parts.isEmpty() && days == 0 && hours == 0)) { 
+            if (minutes > 0 || (parts.isEmpty() && days == 0 && hours == 0)) {
                 parts.add(I18nKey.site.nbMinutes.pluralSameTxt(translate, minutes));
             }
         }
-        
-        if (parts.isEmpty()) { 
+
+        if (parts.isEmpty()) {
             // If duration was very short (e.g. seconds) and useMinutes was false, or all components were zero.
             // Default to showing "0 minutes" if useMinutes was true, or "0 hours" if hours could have been shown, etc.
             // Or, if duration is truly zero, what should be shown? Let's default to "0 minutes" if useMinutes was intended.
@@ -77,7 +77,7 @@ public final class I18nUtils {
     public static String translateDuration(java.time.Duration duration, Translate translate) {
         return translateDuration(duration, Optional.empty(), translate);
     }
-    
+
     // Placeholder for FiniteDuration if it becomes a separate class.
     // For now, assuming java.time.Duration is used.
     // public static String translateFiniteDuration(com.example.common.FiniteDuration finiteDuration, Optional<Boolean> withMinutes, Translate translate) {

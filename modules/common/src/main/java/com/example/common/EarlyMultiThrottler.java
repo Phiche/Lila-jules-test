@@ -42,7 +42,7 @@ public class EarlyMultiThrottler<K> implements AutoCloseable {
     private final Map<String, Queue<WorkItem<?>>> plannedWork = new ConcurrentHashMap<>();
     // Map: Key -> Boolean lock, true if currently processing or in cooldown for this key
     private final Map<String, Boolean> keyLocks = new ConcurrentHashMap<>();
-    
+
     private final ExecutorService workExecutor; // To run the actual tasks
     private final ScheduledExecutorService scheduler; // For cooldowns
     private final boolean shutdownExecutorsOnClose;
@@ -52,7 +52,7 @@ public class EarlyMultiThrottler<K> implements AutoCloseable {
             String name, // Added name for thread factories
             LilaLogger logger,
             Function<K, String> keyToString,
-            ExecutorService workExecutor, 
+            ExecutorService workExecutor,
             ScheduledExecutorService scheduler,
             boolean shutdownExecutorsOnClose) {
         this.logger = logger;
@@ -61,11 +61,11 @@ public class EarlyMultiThrottler<K> implements AutoCloseable {
         this.scheduler = scheduler;
         this.shutdownExecutorsOnClose = shutdownExecutorsOnClose;
     }
-    
+
     // Simplified constructor with default, internally managed executors
     public EarlyMultiThrottler(String name, LilaLogger logger, Function<K, String> keyToString) {
-        this(name, logger, keyToString, 
-             Executors.newCachedThreadPool(new NamedThreadFactory(name + "-work-executor")), 
+        this(name, logger, keyToString,
+             Executors.newCachedThreadPool(new NamedThreadFactory(name + "-work-executor")),
              Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory(name + "-scheduler")),
              true); // Shutdown these internally created executors on close
     }
@@ -80,28 +80,28 @@ public class EarlyMultiThrottler<K> implements AutoCloseable {
         WorkItem<A> currentWork = new WorkItem<>(action, promise);
 
         plannedWork.computeIfAbsent(stringKey, k -> new ConcurrentLinkedQueue<>()).add(currentWork);
-        
+
         // Attempt to acquire lock and process if not already locked
         keyLocks.computeIfAbsent(stringKey, k -> {
             processNextWorkItem(stringKey, cooldown);
             return true; // Mark as locked (processing or cooling down)
         });
-        
+
         return promise;
     }
-    
+
     @SuppressWarnings("unchecked") // For casting WorkItem action and promise
     private void processNextWorkItem(String stringKey, Duration cooldown) {
         Queue<WorkItem<?>> queue = plannedWork.get(stringKey);
         if (queue == null) { // Should not happen if keyLocks entry exists
-            keyLocks.remove(stringKey); 
+            keyLocks.remove(stringKey);
             return;
         }
 
         WorkItem<?> workItem = queue.poll();
         if (workItem == null) { // Queue is now empty for this key
-            keyLocks.remove(stringKey); 
-            return; 
+            keyLocks.remove(stringKey);
+            return;
         }
 
         // Type casting needed due to heterogeneous queue
@@ -119,7 +119,7 @@ public class EarlyMultiThrottler<K> implements AutoCloseable {
             scheduleNextWithCooldown(stringKey, cooldown);
             return;
         }
-        
+
         actionFuture.whenComplete((result, error) -> {
             if (error != null) {
                 promise.completeExceptionally(error);

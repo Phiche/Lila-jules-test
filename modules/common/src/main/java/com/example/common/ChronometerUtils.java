@@ -31,7 +31,7 @@ public final class ChronometerUtils {
         long startNanos = nowNanosRel();
         return futureSupplier.get().thenApply(res -> new Lap<>(res, nowNanosRel() - startNanos));
     }
-    
+
     // syncMon and other Kamon-related methods are stubbed or simplified for now
     public static <A> A timeSyncMon(TimerPath path, Supplier<A> supplier) {
         // KamonTimerPlaceholder timer = path.timer(LilaMon.INSTANCE).start(); // This would require start() to return a started timer

@@ -12,7 +12,7 @@ public class TimerPath {
     // public static TimerPath of(String... parts) {
     //     return new TimerPath(String.join(".", parts));
     // }
-    
+
     // The Scala code uses path(lila.mon) which implies TimerPath might be a function
     // or has an apply method that takes the lila.mon instance.
     // For Java, we'll likely pass LilaMon instance to methods that need it,

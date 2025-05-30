@@ -108,7 +108,7 @@ public class Player {
     public Optional<IntRating> ratingAfter() {
         return rating.flatMap(r -> ratingDiff.map(rd -> new IntRating(r.getValue() + rd.getValue())));
     }
-    
+
     public Optional<IntRating> stableRating() {
         return provisional == RatingProvisional.NO ? rating : Optional.empty();
     }
@@ -128,7 +128,7 @@ public class Player {
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
         // Based on original Scala, equality is often by ID for entities
-        return id.equals(player.id); 
+        return id.equals(player.id);
         // If color also defines unique player in a game context (e.g. playerWhite, playerBlack):
         // return id.equals(player.id) && color == player.color;
         // The provided snippet used `userId` as well, which might be too restrictive if ID is already unique.

@@ -18,7 +18,7 @@ public class NormalizedEmailAddress {
     public String username() {
         return value.substring(0, value.indexOf('@'));
     }
-    
+
     public Optional<Pair<String, Domain>> nameAndDomain() {
          Optional<Domain> d = domain();
          return d.map(dom -> new Pair<>(username(), dom));

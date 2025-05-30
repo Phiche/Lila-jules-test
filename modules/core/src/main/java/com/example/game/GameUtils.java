@@ -34,8 +34,8 @@ public final class GameUtils {
             // Assuming getLimit() is in seconds and getIncrement() is in seconds for this logic.
             // This needs to match how scalachess.Clock.Config works.
             // scalachess ClockConfig limit/increment are in seconds.
-            int limitSeconds = config.getLimit(); 
-            int incrementSeconds = config.getIncrement(); 
+            int limitSeconds = config.getLimit();
+            int incrementSeconds = config.getIncrement();
 
             // Estimate total time: limit + 40 * increment (common way in scalachess)
             long estimatedTotalTimeSeconds = limitSeconds + 40L * incrementSeconds;
@@ -70,7 +70,7 @@ public final class GameUtils {
         Speed speed = calculateSpeed(clockConfig);
         return speed.ordinal() >= Speed.BULLET.ordinal();
     }
-    
+
     /**
      * Helper to calculate speed from ClockConfig. This logic should be centralized
      * if used in multiple places (e.g., in Game.getSpeed() and here).
@@ -82,7 +82,7 @@ public final class GameUtils {
         // If limit and increment are 0, it's ambiguous without more context.
         // For now, this matches the structure of Game.getSpeed() which defaults to CORRESPONDENCE
         // then re-evaluates. A true "clockless" config might be CLASSICAL or some default.
-        if (config.getLimit() == 0 && config.getIncrement() == 0) { 
+        if (config.getLimit() == 0 && config.getIncrement() == 0) {
              // This should ideally check for daysPerTurn if that info were part of ClockConfig
              // or if this method was on Game. For now, if it's truly 0/0, it's very fast or unlimited.
              // Let's assume it implies a very fast game if not correspondence.
@@ -94,7 +94,7 @@ public final class GameUtils {
 
         // Using the logic from Game.getSpeed() for non-correspondence speeds
         // Assumes config.getLimit() is in seconds.
-        int limitInSeconds = config.getLimit(); 
+        int limitInSeconds = config.getLimit();
         // int totalApproximateTime = limitInSeconds + 40 * config.getIncrement(); // More accurate estimate
 
         if (limitInSeconds < 30) return Speed.ULTRA_BULLET;    // < 0.5 min
@@ -123,7 +123,7 @@ public final class GameUtils {
         }
         return result;
     }
-    
+
     /**
      * Determines a reasonable minimum number of moves for a game variant.
      * (This was already implemented as private in Game, providing a public static version here)
@@ -133,7 +133,7 @@ public final class GameUtils {
         switch (variant) {
             case STANDARD:
             case CHESS960:
-            case HORDE: 
+            case HORDE:
                 return 20;
             case ANTICHESS:
             case CRAZYHOUSE:
@@ -145,7 +145,7 @@ public final class GameUtils {
                 return 10;
             // FROM_POSITION is not explicitly listed in scalachess for this method,
             // so it would fall to a default.
-            default: 
+            default:
                 return 15; // Default for FROM_POSITION or any other unlisted variant
         }
     }

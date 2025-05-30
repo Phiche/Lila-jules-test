@@ -21,7 +21,7 @@ public class BatchProvider<A> implements AutoCloseable {
     private final String name;
     private final Duration generateBatchTimeout; // Timeout for the generateBatch operation itself
     private final Supplier<CompletableFuture<List<A>>> generateBatchAsync;
-    
+
     private final List<A> reserve = new LinkedList<>(); // Guarded by access through singleThreadExecutor
     private final ExecutorService singleThreadExecutor;
 
@@ -39,7 +39,7 @@ public class BatchProvider<A> implements AutoCloseable {
 
     public CompletableFuture<A> one() {
         CompletableFuture<A> futureResult = new CompletableFuture<>();
-        
+
         try {
             singleThreadExecutor.submit(() -> {
                 if (singleThreadExecutor.isShutdown()) { // Check if executor is shutting down
@@ -53,7 +53,7 @@ public class BatchProvider<A> implements AutoCloseable {
                     futureResult.complete(reserve.remove(0));
                 } else {
                     CompletableFuture<List<A>> batchFuture = generateBatchAsync.get();
-                    
+
                     batchFuture.orTimeout(generateBatchTimeout.toMillis(), TimeUnit.MILLISECONDS)
                         .whenComplete((batch, throwable) -> {
                             if (throwable != null) {
@@ -106,7 +106,7 @@ public class BatchProvider<A> implements AutoCloseable {
     public void close() {
         shutdownExecutor();
     }
-    
+
     public void shutdownExecutor() {
         if (singleThreadExecutor != null && !singleThreadExecutor.isShutdown()) {
             logger.info("[{}] Shutting down BatchProvider executor.", name);

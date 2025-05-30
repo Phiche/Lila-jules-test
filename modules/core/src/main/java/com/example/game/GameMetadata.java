@@ -61,7 +61,7 @@ public class GameMetadata {
     public Optional<Set<GameRule>> getNonEmptyRules() {
         return rules.isEmpty() ? Optional.empty() : Optional.of(rules);
     }
-    
+
     public static GameMetadata newMetadata(Source source) {
         return new GameMetadata(Optional.ofNullable(source), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
             false, GameDrawOffers.EMPTY, Collections.emptySet());

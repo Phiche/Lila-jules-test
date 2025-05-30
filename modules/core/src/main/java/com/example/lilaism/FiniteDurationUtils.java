@@ -2,7 +2,7 @@ package com.example.lilaism;
 
 import java.time.Duration;
 // Assuming chess.Centis will be defined or is a simple wrapper.
-// import com.example.chess.Centis; 
+// import com.example.chess.Centis;
 
 public class FiniteDurationUtils {
 

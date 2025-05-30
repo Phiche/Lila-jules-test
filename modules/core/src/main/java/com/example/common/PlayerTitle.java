@@ -3,7 +3,7 @@ package com.example.common;
 public enum PlayerTitle {
     BOT("BOT"),
     // Add other titles here
-    GM("GM"); 
+    GM("GM");
 
     private final String value;
 

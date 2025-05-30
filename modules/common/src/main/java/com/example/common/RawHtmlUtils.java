@@ -64,7 +64,7 @@ public final class RawHtmlUtils {
         "(?![\\w/~$&*+=#@%])",                                 // neg lookahead
         Pattern.CASE_INSENSITIVE
     );
-    
+
     // Regex for user links like /@/username
     private static final Pattern USER_LINK_REGEX_PATTERN = Pattern.compile("/@/([\\w-]{2,30})"); // Simplified, removed trailing +?
 
@@ -73,7 +73,7 @@ public final class RawHtmlUtils {
 
     // Regex for Markdown style links: [text](url)
     private static final Pattern MARKDOWN_LINK_REGEX = Pattern.compile("\\[([^\\]]++)]\((https?://[^)]++)\)");
-    
+
     // Regex for common tracking parameters
     private static final Pattern TRACKING_PARAMETERS_REGEX = Pattern.compile("(?:\\?|&(?:amp;)?)(?:utm(?:_\\w+)?|gclid|gclsrc|_ga)=\\w+", Pattern.CASE_INSENSITIVE);
 
@@ -82,11 +82,11 @@ public final class RawHtmlUtils {
         if (url == null) return null;
         return TRACKING_PARAMETERS_REGEX.matcher(url).replaceAll("");
     }
-    
+
     public static Html justMarkdownLinks(Html escapedHtmlInput) {
         if (escapedHtmlInput == null || escapedHtmlInput.getValue() == null) return new Html("");
         String text = escapedHtmlInput.getValue(); // Assuming input is already escaped where needed, except for the links themselves
-        
+
         Matcher matcher = MARKDOWN_LINK_REGEX.matcher(text);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
@@ -95,7 +95,7 @@ public final class RawHtmlUtils {
             // Important: href should be escaped for attribute context if not already.
             // Assuming href from Markdown is a valid URL.
             // Link text itself should NOT be re-escaped if it's meant to be plain text from Markdown.
-            String replacement = String.format("<a rel=\"nofollow noopener noreferrer\" href=\"%s\">%s</a>", 
+            String replacement = String.format("<a rel=\"nofollow noopener noreferrer\" href=\"%s\">%s</a>",
                                                escapeHtmlRaw(href), // Ensure URL is attribute-safe
                                                linkText); // linkText is used as-is from markdown source
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement)); // Quote $ and \ in replacement
@@ -108,7 +108,7 @@ public final class RawHtmlUtils {
         if (text == null) return false;
         return URL_PATTERN.matcher(text).find() || MARKDOWN_LINK_REGEX.matcher(text).find(); // Also check markdown links
     }
-    
+
     private static final Pattern IMGUR_REGEX = Pattern.compile("https?://(?:i\\.)?imgur\\.com/(\\w+)(?:\\.[a-z]{3,4})?(?:\\?.+)?", Pattern.CASE_INSENSITIVE);
     private static final Pattern GIPHY_REGEX = Pattern.compile("https://(?:media\\.giphy\\.com/media/|giphy\\.com/gifs/(?:[\\w-]+-)*)(\\w+)(?:/giphy\\.gif)?(?:\\?.+)?", Pattern.CASE_INSENSITIVE);
     private static final Pattern POSTIMG_REGEX = Pattern.compile("https?://(?:i\\.)?postimg\\.cc/([\\w/-]+)(?:\\.[a-z]{3,4})?(?:\\?.+)?", Pattern.CASE_INSENSITIVE);
@@ -146,10 +146,10 @@ public final class RawHtmlUtils {
      */
     private static int adjustUrlEnd(char[] sArr, int urlSubStringStart, int currentEnd) {
         int last = currentEnd - 1;
-        if (last < urlSubStringStart) return currentEnd; 
+        if (last < urlSubStringStart) return currentEnd;
 
         // Backup original last for parenthesis check if general punctuation stripping happens
-        int originalLast = last; 
+        int originalLast = last;
 
         // First, strip common unambiguous trailing punctuation
         boolean changedByPunctuation = false;
@@ -162,7 +162,7 @@ public final class RawHtmlUtils {
                 break;
             }
         }
-        
+
         // If punctuation was stripped, or if the last char is ')' (even if not stripped by above)
         // then check parenthesis balancing.
         // The original Scala code's parenthesis logic was complex and integrated.
@@ -186,7 +186,7 @@ public final class RawHtmlUtils {
             // This is tricky. A simpler approach: if we strip a ')' and the count of '(' up to that point
             // is less than the count of ')', it's likely a valid part of the URL.
             // The original logic is more like: keep ')' if it balances a '('.
-            
+
             // Let's simplify: strip trailing ')' only if the count of '(' is not greater than ')' before it.
             // This is not a perfect port of the complex Scala loop.
             // The Scala loop was:
@@ -198,10 +198,10 @@ public final class RawHtmlUtils {
             // })) idx -= 1
             // This means it continues stripping as long as the condition is true.
             // The 'parenCnt <= 0' for ')' means it strips ')' if it results in balanced or more closing parens.
-            
+
             // Reset 'last' to where it was before general punctuation stripping if the end char is ')'
             // to re-evaluate with the integrated logic.
-            last = originalLast; 
+            last = originalLast;
             parenCnt = 0;
             int tempLast = last; // Use a temporary index for this loop
             while (tempLast >= urlSubStringStart) {
@@ -256,7 +256,7 @@ public final class RawHtmlUtils {
             }
             String username = m.group(1);
             // Construct the full URL for the user profile
-            parts.add("https://" + netDomain.getValue() + "/@" + username); 
+            parts.add("https://" + netDomain.getValue() + "/@" + username);
             lastAppendPosition = m.end();
         } while (m.find());
 
@@ -271,13 +271,13 @@ public final class RawHtmlUtils {
             boolean expandImg,
             Optional<LinkRender> linkRenderOpt,
             NetDomain netDomain) {
-        
+
         if (text == null || text.isEmpty()) return new Html("");
         Objects.requireNonNull(netDomain, "NetDomain cannot be null");
         Objects.requireNonNull(linkRenderOpt, "LinkRender Optional cannot be null");
 
         List<String> initialParts = expandAtUser(text, netDomain);
-        
+
         StringBuilder resultHtmlBuilder = new StringBuilder();
 
         for (String part : initialParts) {
@@ -312,7 +312,7 @@ public final class RawHtmlUtils {
                     char[] partChars = part.toCharArray();
                     int adjustedEnd = adjustUrlEnd(partChars, m.start(), m.end());
                     String actualMatchedUrl = part.substring(m.start(), adjustedEnd);
-                    
+
                     String httpSchemeDomainGroup = m.group(1); // Domain from http(s)://domain
                     String genericDomainGroup = m.group(2); // Domain like lichess.org
                     // pathGroup (m.group(3)) is not explicitly used in domain check here.
@@ -323,11 +323,11 @@ public final class RawHtmlUtils {
                     } else {
                         matchedDomainForCheck = genericDomainGroup;
                     }
-                    
+
                     // Normalize domain for checking (e.g. remove www.) - this is complex
                     // For now, a direct comparison with netDomain.getValue()
                     boolean isTldInternal = netDomain.getValue().equalsIgnoreCase(matchedDomainForCheck);
-                    
+
                     String urlForHref;
                     String linkTextContent = escapeHtmlRaw(actualMatchedUrl);
 
@@ -350,7 +350,7 @@ public final class RawHtmlUtils {
                             internalPath = internalPath.substring(netDomain.getValue().length());
                         }
                         if (internalPath.isEmpty() || !internalPath.startsWith("/")) internalPath = "/" + internalPath;
-                        
+
                         final String finalInternalPath = removeUrlTrackingParameters(internalPath);
                         final String displaytextForRenderer = netDomain.getValue() + finalInternalPath;
 
@@ -358,7 +358,7 @@ public final class RawHtmlUtils {
                             renderer -> renderer.render(finalInternalPath, displaytextForRenderer)
                                               .map(RawFrag::getValue)
                         );
-                        
+
                         replacement = renderedOpt.orElseGet(() -> {
                             String hrefAttr = escapeHtmlRaw(finalInternalPath.isEmpty() ? "/" : finalInternalPath);
                             String displayLinkText;
@@ -372,9 +372,9 @@ public final class RawHtmlUtils {
                         });
                     } else {
                         Optional<Html> imgHtml = expandImg ? imgUrl(actualMatchedUrl) : Optional.empty();
-                        replacement = imgHtml.map(Html::getValue).orElseGet(() -> 
-                            String.format("<a rel=\"nofollow noreferrer\" href=\"%s\" target=\"_blank\">%s</a>", 
-                                          urlForHref, 
+                        replacement = imgHtml.map(Html::getValue).orElseGet(() ->
+                            String.format("<a rel=\"nofollow noreferrer\" href=\"%s\" target=\"_blank\">%s</a>",
+                                          urlForHref,
                                           linkTextContent)
                         );
                     }

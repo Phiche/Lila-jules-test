@@ -4,7 +4,7 @@ package com.example.common.mon;
 public class LilaMon {
     // This class might hold instances of metric registries or provide static access
     // For now, it's a marker.
-    
+
     // Example of how TimerPath might be used with it, if TimerPath becomes a concrete class
     // public KamonTimer timer(TimerPath path) {
     //     return new KamonTimerPlaceholder(path.toString()); // Placeholder

@@ -107,7 +107,7 @@ public class I18nKey {
         public static final I18nKey prizeBanned = new I18nKey("appeal:prizeBanned");
         // ... (add all other keys from appeal section)
     }
-    
+
     // Placeholder for a 'site' section often used by translateDuration
     public static final class site {
         private site() {}

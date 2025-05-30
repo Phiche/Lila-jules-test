@@ -43,7 +43,7 @@ public final class Either<L, R> {
         if (isLeft) throw new NoSuchElementException("Either.getRight() on a Left value");
         return right;
     }
-    
+
     public Optional<L> getLeftOption() {
         return isLeft ? Optional.of(left) : Optional.empty();
     }
@@ -51,7 +51,7 @@ public final class Either<L, R> {
     public Optional<R> getRightOption() {
         return !isLeft ? Optional.of(right) : Optional.empty();
     }
-    
+
     // Added toOption from Scala's Either for the substitute case
     public Optional<R> toOption() {
         return getRightOption();
@@ -62,7 +62,7 @@ public final class Either<L, R> {
         Objects.requireNonNull(rightMapper, "Right mapper function cannot be null");
         return isLeft ? leftMapper.apply(left) : rightMapper.apply(right);
     }
-    
+
     // Add other useful methods like map, flatMap if needed later
     // Example map (maps the right side, or keeps left as is)
     @SuppressWarnings("unchecked")

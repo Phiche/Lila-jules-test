@@ -21,12 +21,12 @@ public final class LilaFutureUtils {
             Duration minDuration,
             Supplier<CompletableFuture<T>> futureSupplier,
             ScheduledExecutorService scheduler,
-            Executor executor) { 
+            Executor executor) {
 
         if (minDuration == null || minDuration.isZero() || minDuration.isNegative()) {
             return futureSupplier.get();
         }
-        
+
         long startTimeNanos = System.nanoTime(); // Using System.nanoTime() directly
         CompletableFuture<T> originalFuture = futureSupplier.get();
 
@@ -51,26 +51,26 @@ public final class LilaFutureUtils {
             Duration duration,
             Supplier<CompletableFuture<A>> runSupplier,
             ScheduledExecutorService scheduler,
-            Executor executor) { 
+            Executor executor) {
 
         if (duration == null || duration.isZero() || duration.isNegative()) {
             // Execute immediately on the provided executor and flatten
             return CompletableFuture.supplyAsync(runSupplier, executor).thenCompose(cf -> cf);
         }
-        
+
         CompletableFuture<A> resultFuture = new CompletableFuture<>();
         scheduler.schedule(() -> {
             try {
                 CompletableFuture.supplyAsync(runSupplier, executor)
-                    .thenCompose(cf -> cf) 
-                    .whenComplete((res, err) -> { 
+                    .thenCompose(cf -> cf)
+                    .whenComplete((res, err) -> {
                         if (err != null) {
                             resultFuture.completeExceptionally(err);
                         } else {
                             resultFuture.complete(res);
                         }
                     });
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 resultFuture.completeExceptionally(e);
             }
         }, duration.toMillis(), TimeUnit.MILLISECONDS);
@@ -87,7 +87,7 @@ public final class LilaFutureUtils {
         if (duration == null || duration.isZero() || duration.isNegative()) {
             return CompletableFuture.completedFuture(null);
         }
-        
+
         CompletableFuture<Void> future = new CompletableFuture<>();
         scheduler.schedule(() -> future.complete(null), duration.toMillis(), TimeUnit.MILLISECONDS);
         return future;
@@ -100,12 +100,12 @@ public final class LilaFutureUtils {
             Supplier<CompletableFuture<T>> operation,
             Duration delayDuration,
             int retries,
-            Optional<LilaLogger> loggerOpt, 
+            Optional<LilaLogger> loggerOpt,
             ScheduledExecutorService scheduler,
-            Executor executor) { 
+            Executor executor) {
 
         CompletableFuture<T> resultPromise = new CompletableFuture<>();
-        
+
         class RetryAttempt { // Changed to inner class for state, not a direct Supplier for CompletableFuture
             private int currentAttempt = 0;
 
@@ -114,7 +114,7 @@ public final class LilaFutureUtils {
                 operation.get().whenCompleteAsync((result, error) -> {
                     if (error != null) {
                         if (currentAttempt <= retries) {
-                            final int attemptNum = currentAttempt; 
+                            final int attemptNum = currentAttempt;
                             loggerOpt.ifPresent(log -> log.info(
                                 "[" + attemptNum + "/" + retries + "] retrying operation - error: " + error.getMessage()
                             ));
@@ -132,10 +132,10 @@ public final class LilaFutureUtils {
                     } else {
                         resultPromise.complete(result);
                     }
-                }, executor); 
+                }, executor);
             }
         }
-        
+
         new RetryAttempt().attempt(); // Initial call to start the process
         return resultPromise;
     }

@@ -1,8 +1,8 @@
 package com.example.chess;
 
-import java.util.Optional; 
-import java.util.Collections; 
-import java.util.List; 
+import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects; // For Objects.requireNonNull
 
 
@@ -25,13 +25,13 @@ public class Opening {
         this.nbMoves = nbMoves;
         this.exampleMoves = exampleMoves == null ? Collections.emptyList() : Collections.unmodifiableList(exampleMoves);
     }
-    
+
     // Simpler constructor if less detail is initially available from a flat structure
     public Opening(String code, String name, String familyKey, String familyName, String variationName, int plyCount) {
         this.code = Objects.requireNonNull(code, "Opening code cannot be null");
         this.name = Objects.requireNonNull(name, "Opening name cannot be null");
         this.family = new OpeningFamily(
-            Objects.requireNonNull(familyKey, "Family key cannot be null"), 
+            Objects.requireNonNull(familyKey, "Family key cannot be null"),
             Objects.requireNonNull(familyName, "Family name cannot be null")
         );
         this.variation = Optional.ofNullable(variationName).filter(s -> !s.isEmpty());
@@ -42,9 +42,9 @@ public class Opening {
 
     public String getCode() { return code; }
     public String getName() { return name; }
-    public OpeningFamily getFamily() { return family; } 
-    public Optional<String> getVariation() { return variation; } 
-    public int getNbMoves() { return nbMoves; } 
+    public OpeningFamily getFamily() { return family; }
+    public Optional<String> getVariation() { return variation; }
+    public int getNbMoves() { return nbMoves; }
     public List<SanStr> getExampleMoves() { return exampleMoves; }
 
 
@@ -64,7 +64,7 @@ public class Opening {
              super(code, name, familyKey, familyName, variationName, openingMoveCount);
              this.ply = Objects.requireNonNull(ply, "Ply cannot be null for Opening.AtPly");
          }
-         
+
          public Ply getPly() { return ply; }
     }
 }

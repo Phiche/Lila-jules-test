@@ -29,7 +29,7 @@ public class UaMatcher {
             return false;
         }
         // Check for the "matches nothing" pattern if compilation failed
-        if ("a^".equals(pattern.pattern())) { 
+        if ("a^".equals(pattern.pattern())) {
             return false;
         }
         return pattern.matcher(userAgent.getValue()).find();

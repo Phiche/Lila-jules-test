@@ -131,7 +131,7 @@ public class Game {
         }
         return clockHistoryCache;
     }
-    
+
     // --- toString ---
     @Override
     public String toString() {
@@ -388,7 +388,7 @@ public class Game {
         boolean isImport = getSource().map(s -> s == com.example.game.Source.IMPORT).orElse(false);
         return getStatus().ordinal() < Status.ABORTED.ordinal() && !isImport;
     }
-    
+
     // Helper method to get userIds for the start() method, similar to Scala's userIds
     public List<UserId> getUserIds() {
         List<UserId> ids = new java.util.ArrayList<>();
@@ -447,7 +447,7 @@ public class Game {
     public boolean isAbortableByUser() {
         return isAbortable() && !hasRule(com.example.game.GameRule.NO_ABORT);
     }
-    
+
     // --- Helper method similar to Scala's bothPlayersHaveMoved (if not already present) ---
     /**
      * Checks if both players have made at least one move.
@@ -458,7 +458,7 @@ public class Game {
         // So, if current ply is 2 (after black's first move), playedTurns is 2.
         return getPlayedTurns() >= 2;
     }
-    
+
     // --- Helper method for isFinished (if not already present) ---
     /**
      * Checks if the game status is Mate or later (finished).
@@ -526,7 +526,7 @@ public class Game {
     public boolean isLobbyOrPool() {
         return getSource().map(s -> s == com.example.game.Source.LOBBY || s == com.example.game.Source.POOL).orElse(false);
     }
-    
+
     // --- Helper for hasClock (if not already present) ---
     /**
      * Checks if the game has a clock.
@@ -585,8 +585,8 @@ public class Game {
     }
 
     private boolean outoftimeClock(boolean withGrace) {
-        return getClock().map(c -> 
-            isStarted() && isPlayable() && 
+        return getClock().map(c ->
+            isStarted() && isPlayable() &&
             (c.outOfTime(getTurnColor(), withGrace) ||
              (!c.isRunning() && c.getPlayers().exists(pc -> pc.elapsed().getValue() > 0)))
         ).orElse(false);
@@ -712,13 +712,13 @@ public class Game {
         // Scala: playedTurns <= reasonableMinimumNumberOfMoves(variant)
         return getPlayedTurns() <= getReasonableMinimumNumberOfMoves(getVariant());
     }
-    
+
     // Placeholder for reasonableMinimumNumberOfMoves, logic depends on variant
     private int getReasonableMinimumNumberOfMoves(Variant variant) {
         // This logic needs to be ported from scalachess or game rules
         if (variant == Variant.ATOMIC) return 2; // Example from scalachess
         // Based on scalachess.Game.scala, most variants default to 2 if not specified otherwise
-        return 2; 
+        return 2;
     }
 
 
@@ -733,7 +733,7 @@ public class Game {
         }
         return Optional.empty();
     }
-    
+
     // Placeholder for Variant.list.openingSensibleVariants(variant)
     // from scalachess.variant.Variant.scala
     private boolean isOpeningSensibleVariant(Variant variant) {

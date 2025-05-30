@@ -49,7 +49,7 @@ public enum Source {
     public static final Set<Source> EXPIRABLE = Collections.unmodifiableSet(
             Arrays.stream(new Source[]{LOBBY, ARENA, POOL, SWISS}).collect(Collectors.toSet())
     );
-    
+
     public static Optional<Source> byId(int id) { // Added Optional import
         return Optional.ofNullable(BY_ID.get(id));
     }

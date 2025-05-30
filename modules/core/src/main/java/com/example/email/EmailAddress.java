@@ -79,7 +79,7 @@ public class EmailAddress {
     public boolean similarTo(EmailAddress other) {
         return this.normalize().eliminateDomainAlias().equals(other.normalize().eliminateDomainAlias());
     }
-    
+
     public NormalizedEmailAddress eliminateDomainAlias() {
         return nameAndDomain().map(pair -> {
             String name = pair.getKey();

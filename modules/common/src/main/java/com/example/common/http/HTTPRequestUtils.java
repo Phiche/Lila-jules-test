@@ -32,7 +32,7 @@ public final class HTTPRequestUtils {
     public static boolean isUnsafe(HttpServletRequest req) {
         return !isSafe(req);
     }
-    
+
     public static Optional<String> getHeader(HttpServletRequest req, String headerName) {
         if (req == null) return Optional.empty();
         return Optional.ofNullable(req.getHeader(headerName));
@@ -59,7 +59,7 @@ public final class HTTPRequestUtils {
             )
         );
     }
-    
+
     public static UserAgent userAgent(HttpServletRequest req) {
         return UserAgent.from(getHeader(req, HttpHeaders.USER_AGENT));
     }
@@ -77,7 +77,7 @@ public final class HTTPRequestUtils {
         if (req == null || req.getRequestURI() == null) return false;
         return req.getRequestURI().startsWith("/assets/");
     }
-    
+
     public static IpAddress ipAddress(HttpServletRequest req) {
         if (req == null) return IpAddress.unchecked("127.0.0.1"); // Default for null request
 
@@ -90,14 +90,14 @@ public final class HTTPRequestUtils {
         } else {
             remoteAddr = req.getRemoteAddr();
         }
-        
+
         if (remoteAddr == null) {
             return IpAddress.unchecked("127.0.0.1"); // Should not happen if req is not null
         }
         // Strip scope id if present (e.g., %eth0)
         return IpAddress.unchecked(remoteAddr.split("%")[0]);
     }
-    
+
     // trueish logic helper
     private static boolean trueish(String value) {
         if (value == null) return false;
@@ -108,7 +108,7 @@ public final class HTTPRequestUtils {
     public static boolean isKid(HttpServletRequest req) {
         return getHeader(req, "X-Lichess-KidMode").map(HTTPRequestUtils::trueish).orElse(false);
     }
-    
+
     // More methods (UaMatcher, crawlers, etc.) to be added in next step
 
 
@@ -133,7 +133,7 @@ public final class HTTPRequestUtils {
     public static boolean isLichobileDev(HttpServletRequest req) {
         return isLichobile(req) || (appOrigin(req).isPresent() && !isLichessMobile(req));
     }
-    
+
     public static final UaMatcher IS_ANDROID = new UaMatcher("Android");
     public static boolean isAndroid(HttpServletRequest req) {
         return IS_ANDROID.matches(userAgent(req));
@@ -156,7 +156,7 @@ public final class HTTPRequestUtils {
     public static Crawler isCrawler(HttpServletRequest req) {
         return new Crawler(CRAWLER_MATCHER.matches(userAgent(req)));
     }
-    
+
     private static final UaMatcher IMAGE_PREVIEW_CRAWLER_MATCHER = new UaMatcher(
         "BingPreview|Discordbot|WhatsApp"
     );
@@ -164,13 +164,13 @@ public final class HTTPRequestUtils {
     public static Crawler isImagePreviewCrawler(HttpServletRequest req) {
          return new Crawler(IMAGE_PREVIEW_CRAWLER_MATCHER.matches(userAgent(req)));
     }
-    
+
     public static boolean uaMatches(HttpServletRequest req, Pattern regex) {
         if (regex == null) return false;
         UserAgent ua = userAgent(req);
         return ua != null && ua.getValue() != null && regex.matcher(ua.getValue()).find();
     }
-    
+
     // Overload for UaMatcher if preferred
     public static boolean uaMatches(HttpServletRequest req, UaMatcher uaMatcher) {
         if (uaMatcher == null) return false;
@@ -194,7 +194,7 @@ public final class HTTPRequestUtils {
         if (req == null || req.getRequestURI() == null) return false;
         return FILE_EXTENSION_REGEX.matcher(req.getRequestURI()).find();
     }
-    
+
     public static String print(HttpServletRequest req) {
         if (req == null) return "null request";
         return printReq(req) + " " + printClient(req);
@@ -204,7 +204,7 @@ public final class HTTPRequestUtils {
         if (req == null) return "null request details";
         String domain = req.getServerName() != null ? req.getServerName() : "";
         String uri = req.getRequestURI() != null ? req.getRequestURI() : "";
-        return req.getMethod() + " " + domain + uri + 
+        return req.getMethod() + " " + domain + uri +
                (req.getQueryString() != null ? "?" + req.getQueryString() : "");
     }
 
@@ -295,7 +295,7 @@ public final class HTTPRequestUtils {
         if (req == null || req.getRequestURI() == null) return false;
         return req.getRequestURI().equals(exactPath);
     }
-    
+
     private static boolean pathStartsWith(HttpServletRequest req, String prefix) {
         if (req == null || req.getRequestURI() == null) return false;
         return req.getRequestURI().startsWith(prefix);
@@ -360,7 +360,7 @@ public final class HTTPRequestUtils {
         }
         return Optional.empty();
     }
-    
+
     public static boolean looksLikeLichessBot(HttpServletRequest req) {
         UserAgent ua = userAgent(req); // userAgent handles null req
         return ua.getValue().startsWith("lichess-bot/") ||

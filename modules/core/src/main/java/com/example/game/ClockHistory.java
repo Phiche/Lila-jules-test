@@ -41,7 +41,7 @@ public class ClockHistory {
         // Centis remainingTime = clock.getPlayers().get(color).remainingTime(); // If PlayerClock had remainingTime
         // Or if Clock itself provides remaining time for a color.
         Centis remainingTime = new Centis(clock.getTime()); // Placeholder: clock.getRemainingTime(color) or similar
-        
+
         Function<List<Centis>, List<Centis>> recordFn = list -> {
             List<Centis> newList = new ArrayList<>(list);
             newList.add(remainingTime);
@@ -71,7 +71,7 @@ public class ClockHistory {
     public List<Centis> getBothClockStates(Color firstMoveBy) {
         List<Centis> first = (firstMoveBy == Color.WHITE) ? white : black;
         List<Centis> second = (firstMoveBy == Color.WHITE) ? black : white;
-        
+
         List<Centis> interleaved = new ArrayList<>();
         int i = 0, j = 0;
         while (i < first.size() || j < second.size()) {
